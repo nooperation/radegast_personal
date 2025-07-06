@@ -201,6 +201,7 @@ namespace Radegast
         /// Return links found in Current Outfit Folder
         /// </summary>
         /// <returns>List of <see cref="InventoryItem"/> that can be part of appearance (attachments, wearables)</returns>
+        /// <param name="cancellationToken"></param>
         private async Task<List<InventoryItem>> GetCurrentOutfitLinks(CancellationToken cancellationToken = default)
         {
             if (COF == null)
@@ -248,13 +249,14 @@ namespace Radegast
         /// Creates a new COF link
         /// </summary>
         /// <param name="item">Original item to be linked from COF</param>
+        /// <param name="cancellationToken"></param>
         private async Task AddLink(InventoryItem item, CancellationToken cancellationToken = default)
         {
             if (item is InventoryWearable wearableItem && !IsBodyPart(item))
             {
                 var layer = 0;
-                var desc = $"{(int)wearableItem.WearableType}{layer:00}";
-                await AddLink(item, desc, cancellationToken);
+                var description = $"{(int)wearableItem.WearableType}{layer:00}";
+                await AddLink(item, description, cancellationToken);
             }
             else
             {
@@ -267,6 +269,7 @@ namespace Radegast
         /// </summary>
         /// <param name="item">Original item to be linked from COF</param>
         /// <param name="newDescription">Description for the link</param>
+        /// <param name="cancellationToken"></param>
         private async Task AddLink(InventoryItem item, string newDescription, CancellationToken cancellationToken = default)
         {
             if (COF == null)
@@ -310,7 +313,7 @@ namespace Radegast
         /// <summary>
         /// Removes all COF links to the specified item ID's
         /// </summary>
-        /// <param name="itemIDsToRemove">List of actual item ID's we want to removel COF links to</param>
+        /// <param name="itemIDsToRemove">List of actual item ID's we want to remove COF links to</param>
         /// <param name="cancellationToken"></param>
         private async Task RemoveLinks(List<UUID> itemIDsToRemove, CancellationToken cancellationToken = default)
         {
@@ -413,6 +416,7 @@ namespace Radegast
         /// Remove attachment
         /// </summary>
         /// <param name="item">Inventory item to be detached</param>
+        /// <param name="cancellationToken"></param>
         public async Task Detach(InventoryItem item, CancellationToken cancellationToken = default)
         {
             var realItem = Instance.COF.ResolveInventoryLink(item);
@@ -466,7 +470,9 @@ namespace Radegast
         /// <summary>
         /// Replaces the current outfit and updates COF links accordingly
         /// </summary>
-        /// <param name="newOutfit">List of new wearables and attachments that comprise the new outfit</param>
+        /// <param name="newOutfitFolderId">List of new wearables and attachments that comprise the new outfit</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>True on success</returns>
         public async Task<bool> ReplaceOutfit(UUID newOutfitFolderId, CancellationToken cancellationToken = default)
         {
             // TODO: Copy from library if necessary
@@ -754,6 +760,7 @@ namespace Radegast
         /// </summary>
         /// <param name="item">Item to add</param>
         /// <param name="replace">Should existing wearable of the same type be removed</param>
+        /// <param name="cancellationToken"></param>
         public async Task AddToOutfit(InventoryItem item, bool replace, CancellationToken cancellationToken = default)
         {
             await AddToOutfit(new List<InventoryItem>(1) { item }, replace, cancellationToken);
@@ -764,6 +771,7 @@ namespace Radegast
         /// </summary>
         /// <param name="itemsToAdd">List of items to add</param>
         /// <param name="replace">Should existing wearable of the same type be removed</param>
+        /// <param name="cancellationToken"></param>
         public async Task AddToOutfit(List<InventoryItem> itemsToAdd, bool replace, CancellationToken cancellationToken = default)
         {
             // TODO: Copy from library if necessary
@@ -1035,9 +1043,7 @@ namespace Radegast
         /// Retrieves the linked item from <paramref name="itemLink"/> if it is a link.
         /// </summary>
         /// <param name="itemLink">The link to an inventory item</param>
-        /// <returns>
-        /// The original inventory item, or null if the link could not be resolved
-        /// </returns>
+        /// <returns>The original inventory item, or null if the link could not be resolved</returns>
         public InventoryItem ResolveInventoryLink(InventoryItem itemLink)
         {
             if (itemLink.AssetType != AssetType.Link)
@@ -1081,7 +1087,7 @@ namespace Radegast
         }
 
         /// <summary>
-        /// Determines if inventoy item <paramref name="item"/> is a descendant of inventory folder <paramref name="parentId"/>
+        /// Determines if inventory item <paramref name="item"/> is a descendant of inventory folder <paramref name="parentId"/>
         /// </summary>
         /// <param name="item">Item to check</param>
         /// <param name="parentId">ID of the folder to check</param>
@@ -1089,7 +1095,7 @@ namespace Radegast
         /// <returns>True if <paramref name="item"/> exists as a child, or sub-child of folder <paramref name="parentId"/></returns>
         public async Task<bool> IsObjectDescendentOf(InventoryBase item, UUID parentId, CancellationToken cancellationToken = default)
         {
-            const int kArbritrayDepthLimit = 255;
+            const int kArbitraryDepthLimit = 255;
 
             if (parentId == UUID.Zero)
             {
@@ -1097,7 +1103,7 @@ namespace Radegast
             }
 
             var parentIter = item;
-            for (var i = 0; i < kArbritrayDepthLimit; ++i)
+            for (var i = 0; i < kArbitraryDepthLimit; ++i)
             {
                 if (parentIter.ParentUUID == parentId)
                 {
