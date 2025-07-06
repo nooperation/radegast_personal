@@ -170,9 +170,30 @@ namespace Radegast
         readonly List<RLVRule> rules = new List<RLVRule>();
         System.Timers.Timer CleanupTimer;
 
+        public class RLVCOFPolicy : ICOFPolicy
+        {
+            private RLVManager _rlvManager;
+
+            public RLVCOFPolicy(RLVManager rlvManager)
+            {
+                _rlvManager = rlvManager;
+            }
+
+            public bool CanAttach(InventoryItem item)
+            {
+                return true;
+            }
+
+            public bool CanDetach(InventoryItem item)
+            {
+                return _rlvManager.AllowDetach(item);
+            }
+        }
+
         public RLVManager(RadegastInstance instance)
         {
             this.instance = instance;
+            instance.COF.AddPolicy(new RLVCOFPolicy(this));
 
             if (Enabled)
             {
