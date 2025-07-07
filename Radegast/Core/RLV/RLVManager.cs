@@ -172,11 +172,11 @@ namespace Radegast
 
         public class RLVCOFPolicy : ICOFPolicy
         {
-            private RLVManager _rlvManager;
+            private RLVManager rlvManager;
 
             public RLVCOFPolicy(RLVManager rlvManager)
             {
-                _rlvManager = rlvManager;
+                this.rlvManager = rlvManager;
             }
 
             public bool CanAttach(InventoryItem item)
@@ -186,7 +186,7 @@ namespace Radegast
 
             public bool CanDetach(InventoryItem item)
             {
-                return _rlvManager.AllowDetach(item);
+                return rlvManager.AllowDetach(item);
             }
         }
 

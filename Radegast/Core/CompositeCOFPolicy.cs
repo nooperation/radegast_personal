@@ -7,14 +7,14 @@ namespace Radegast
 {
     internal class CompositeCOFPolicy : ICOFPolicy
     {
-        private readonly object _policiesLock = new object();
-        private ImmutableHashSet<ICOFPolicy> _policies = ImmutableHashSet<ICOFPolicy>.Empty;
+        private readonly object policiesLock = new object();
+        private ImmutableHashSet<ICOFPolicy> policies = ImmutableHashSet<ICOFPolicy>.Empty;
 
         private ImmutableHashSet<ICOFPolicy> GetCurrentPolicies()
         {
-            lock (_policiesLock)
+            lock (policiesLock)
             {
-                return _policies;
+                return policies;
             }
         }
 
@@ -25,9 +25,9 @@ namespace Radegast
                 throw new ArgumentNullException(nameof(policyToAdd));
             }
 
-            lock (_policiesLock)
+            lock (policiesLock)
             {
-                _policies = _policies.Add(policyToAdd);
+                policies = policies.Add(policyToAdd);
             }
 
             return this;
@@ -35,9 +35,9 @@ namespace Radegast
 
         public void RemovePolicy(ICOFPolicy policyToRemove)
         {
-            lock (_policiesLock)
+            lock (policiesLock)
             {
-                _policies = _policies.Remove(policyToRemove);
+                policies = policies.Remove(policyToRemove);
             }
         }
 
